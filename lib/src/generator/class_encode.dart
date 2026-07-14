@@ -1,4 +1,5 @@
-// ignore_for_file: use_string_buffers
+// Analyzer 8 marks required replacement element APIs as experimental.
+// ignore_for_file: experimental_member_use, use_string_buffers
 
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -22,8 +23,10 @@ String _writeAccessor(ClassElement cls) {
       continue; // we don't support serializing nested objects
     }
 
-    final raw = !accessor.jsonName.codeUnits
-        .any((e) => e == tokenDoubleQuote || e == tokenBackslash || e > 127);
+    final raw =
+        !accessor.jsonName.codeUnits.any(
+          (e) => e == tokenDoubleQuote || e == tokenBackslash || e > 127,
+        );
     if (raw) {
       code += "writeObjectKeyRaw('${accessor.jsonName}');";
     } else {

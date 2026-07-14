@@ -1,3 +1,6 @@
+// Analyzer 8 marks required replacement element APIs as experimental.
+// ignore_for_file: experimental_member_use
+
 import 'package:analyzer/dart/element/element.dart';
 import 'package:crimson/src/generator/util.dart';
 
@@ -7,10 +10,12 @@ String generateFromFactory(ClassElement element) {
   // check originalClass for freezed
   if (element.displayName.startsWith(r'_$') &&
       element.displayName.endsWith('Impl')) {
-    final interface = element.interfaces
-        .firstWhere((e) => e.element.displayName == '_${element.cleanName}');
-    final originalClass = interface.interfaces
-        .firstWhere((e) => e.element.displayName == element.cleanName);
+    final interface = element.interfaces.firstWhere(
+      (e) => e.element.displayName == '_${element.cleanName}',
+    );
+    final originalClass = interface.interfaces.firstWhere(
+      (e) => e.element.displayName == element.cleanName,
+    );
     ele = originalClass.element as ClassElement;
   }
 

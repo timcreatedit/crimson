@@ -7,14 +7,11 @@ part 'from_json_test.freezed.dart';
 
 // Need to disable fromJson/toJson OR it generates:
 // FJFreezed _$FJFreezedFromJson(Map<String, dynamic> json) {...}
+@json
 @Freezed(fromJson: false, toJson: false)
-class FJFreezed with _$FJFreezed {
-  // ignore: invalid_annotation_target
-  @json
-  const factory FJFreezed({
-    required String name,
-    required int age,
-  }) = _FJFreezed;
+abstract class FJFreezed with _$FJFreezed {
+  const factory FJFreezed({required String name, required int age}) =
+      _FJFreezed;
 
   // and would THEN throw this error
   // The name '_$FJFreezedFromJson' is already defined.

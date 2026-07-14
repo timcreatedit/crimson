@@ -38,10 +38,7 @@ enum SnakeCaseEnum {
 }
 
 @json
-enum NormalEnum {
-  testValue,
-  testValue2,
-}
+enum NormalEnum { testValue, testValue2 }
 
 void main() {
   test('@jsonSnakeCase', () {

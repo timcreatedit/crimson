@@ -1,4 +1,5 @@
-// ignore_for_file: use_string_buffers
+// Analyzer 8 marks required replacement element APIs as experimental.
+// ignore_for_file: experimental_member_use, use_string_buffers
 
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -32,7 +33,7 @@ String _generateAccessorVariables(ClassElement cls) {
   var code = '';
   for (final accessor in cls.allAccessors) {
     final nullable = accessor.type.isNullable;
-    final hasDefault = cls.defaultValue(accessor.name) != null;
+    final hasDefault = cls.defaultValue(accessor.name!) != null;
     final prefix = nullable || hasDefault ? '' : 'late';
     final suffix = !nullable && hasDefault ? '?' : '';
     code += '$prefix ${accessor.type}$suffix ${accessor.name};';
@@ -49,10 +50,12 @@ String _generateReadAccessors(ClassElement cls) {
       code += 'case ${Crimson.hash(pointer[0].toString())}: // ${pointer[0]}\n';
 
       final fromJson = accessor.fromJson;
-      final type = fromJson?.parameters.first.type ?? accessor.type;
-      final hasDefault = cls.defaultValue(accessor.name) != null;
-      var value =
-          _read(type, type.isNullable || (hasDefault && fromJson == null));
+      final type = fromJson?.formalParameters.first.type ?? accessor.type;
+      final hasDefault = cls.defaultValue(accessor.name!) != null;
+      var value = _read(
+        type,
+        type.isNullable || (hasDefault && fromJson == null),
+      );
       if (fromJson != null) {
         value = '${fromJson.qualifiedName}($value)';
         if (!type.isNullable && hasDefault) {
@@ -116,7 +119,7 @@ String _generateReadSegment(dynamic segment, String read) {
 String _generateCreateObject(ClassElement cls) {
   var code = 'final obj = ${cls.cleanName}(';
   for (final accessor in cls.allAccessors) {
-    final param = cls.constructorParam(accessor.name);
+    final param = cls.constructorParam(accessor.name!);
     if (param == null) {
       continue;
     }
@@ -133,7 +136,7 @@ String _generateCreateObject(ClassElement cls) {
   code += ');';
 
   for (final accessor in cls.allAccessors) {
-    if (cls.constructorParam(accessor.name) == null &&
+    if (cls.constructorParam(accessor.name!) == null &&
         accessor.setter != null) {
       code += 'obj.${accessor.name} = ${accessor.name};';
     }
