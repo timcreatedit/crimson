@@ -98,7 +98,7 @@ const rfcJson = {
   "i\\j": 5,
   "k\"l": 6,
   " ": 7,
-  "m~n": 8,
+  "m~n": 8
 };
 
 void main() {
@@ -132,7 +132,10 @@ void main() {
     });
 
     test('missing field', () {
-      final json = {'before': '123', 'after': '456'};
+      final json = {
+        'before': '123',
+        'after': '456',
+      };
       final obj = Crimson(bytes(json)).readPointerTest();
       expect(obj.before, '123');
       expect(obj.after, '456');
@@ -146,10 +149,10 @@ void main() {
         'foo': [
           {},
           {},
-          {'baz': 'a'},
+          {'baz': 'a'}
         ],
         '2': {
-          'moo': ['b', 'c'],
+          'moo': ['b', 'c']
         },
         'after': '456',
       };
@@ -161,7 +164,12 @@ void main() {
     });
 
     test('wrong field type', () {
-      final json = {'before': '123', 'foo': 4, '2': 'a', 'after': '456'};
+      final json = {
+        'before': '123',
+        'foo': 4,
+        '2': 'a',
+        'after': '456',
+      };
       final obj = Crimson(bytes(json)).readPointerTest();
       expect(obj.before, '123');
       expect(obj.after, '456');
@@ -182,7 +190,12 @@ void main() {
     });
 
     test('empty field', () {
-      final json = {'before': '123', 'foo': {}, '2': {}, 'after': '456'};
+      final json = {
+        'before': '123',
+        'foo': {},
+        '2': {},
+        'after': '456',
+      };
       final obj = Crimson(bytes(json)).readPointerTest();
       expect(obj.before, '123');
       expect(obj.after, '456');
@@ -208,10 +221,10 @@ void main() {
         'foo': [
           'a',
           'b',
-          {'bar': 'c'},
+          {'bar': 'c'}
         ],
         '2': {
-          'foo': ['d', 'e'],
+          'foo': ['d', 'e']
         },
         'after': '456',
       };

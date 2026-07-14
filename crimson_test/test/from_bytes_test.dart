@@ -5,11 +5,14 @@ import 'package:test/test.dart';
 part 'from_bytes_test.g.dart';
 part 'from_bytes_test.freezed.dart';
 
-@json
 @freezed
-abstract class FBFreezed with _$FBFreezed {
-  const factory FBFreezed({required String name, required int age}) =
-      _FBFreezed;
+class FBFreezed with _$FBFreezed {
+  // ignore: invalid_annotation_target
+  @json
+  const factory FBFreezed({
+    required String name,
+    required int age,
+  }) = _FBFreezed;
 
   factory FBFreezed.fromBytes(Uint8List bytes) => _$FBFreezedFromBytes(bytes);
 }

@@ -87,8 +87,7 @@ class CrimsonWriter {
         } else if ((char & surrogateTagMask) == leadSurrogateMin) {
           // combine surrogate pair
           final nextChar = value.codeUnitAt(++i);
-          final rune =
-              0x10000 + ((char & surrogateValueMask) << 10) |
+          final rune = 0x10000 + ((char & surrogateValueMask) << 10) |
               (nextChar & surrogateValueMask);
           // If the rune is encoded with 2 code-units then it must be encoded
           // with 4 bytes in UTF-8.

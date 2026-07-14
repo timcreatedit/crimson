@@ -79,12 +79,13 @@ class Crimson {
         skipPartialObject();
       default:
         _skipNumber();
+        break;
     }
   }
 
   void _skipString() {
     var escaped = false;
-    for (var i = _offset; ; i++) {
+    for (var i = _offset;; i++) {
       final c = buffer[i];
       if (c == tokenDoubleQuote) {
         if (!escaped) {
@@ -391,8 +392,7 @@ class Crimson {
       } else if (bc == tokenBackslash) {
         final nextChar = buffer[i++];
         if (nextChar == tokenU) {
-          bc =
-              (_parseHexDigit(i++) << 12) +
+          bc = (_parseHexDigit(i++) << 12) +
               (_parseHexDigit(i++) << 8) +
               (_parseHexDigit(i++) << 4) +
               _parseHexDigit(i++);
@@ -409,8 +409,7 @@ class Crimson {
             bc = ((bc & 0x0F) << 12) + ((u2 & 0x3F) << 6) + (u3 & 0x3F);
           } else {
             final u4 = buffer[i++];
-            bc =
-                ((bc & 0x07) << 18) +
+            bc = ((bc & 0x07) << 18) +
                 ((u2 & 0x3F) << 12) +
                 ((u3 & 0x3F) << 6) +
                 (u4 & 0x3F);

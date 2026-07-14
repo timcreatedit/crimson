@@ -6,19 +6,19 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:crimson/src/annotations.dart';
 import 'package:source_gen/source_gen.dart';
 
-const TypeChecker _jsonChecker = TypeChecker.typeNamed(Json);
-const TypeChecker _jsonKebabChecker = TypeChecker.typeNamed(JsonKebabCase);
-const TypeChecker _jsonSnakeChecker = TypeChecker.typeNamed(JsonSnakeCase);
-const TypeChecker _nameChecker = TypeChecker.typeNamed(JsonName);
-const TypeChecker _ignoreChecker = TypeChecker.typeNamed(JsonIgnore);
-const TypeChecker _convertChecker = TypeChecker.typeNamed(JsonConvert);
+const TypeChecker _jsonChecker = TypeChecker.fromRuntime(Json);
+const TypeChecker _jsonKebabChecker = TypeChecker.fromRuntime(JsonKebabCase);
+const TypeChecker _jsonSnakeChecker = TypeChecker.fromRuntime(JsonSnakeCase);
+const TypeChecker _nameChecker = TypeChecker.fromRuntime(JsonName);
+const TypeChecker _ignoreChecker = TypeChecker.fromRuntime(JsonIgnore);
+const TypeChecker _convertChecker = TypeChecker.fromRuntime(JsonConvert);
 
 extension ClassElementX on ClassElement {
   String get cleanName {
     // hack to fix freezed names
     if (displayName.startsWith(r'_$') && displayName.endsWith('Impl')) {
       return displayName
-          .substring(0, name!.length - 4) // remove Impl
+          .substring(0, name.length - 4) // remove Impl
           .replaceFirst(r'_$', ''); // remove _$
     }
 
@@ -28,28 +28,25 @@ extension ClassElementX on ClassElement {
   List<PropertyInducingElement> get allAccessors {
     final accessorNames = <String>{};
     return [
-          ...getters.map((e) => e.variable),
-          ...setters.map((e) => e.variable),
-          for (final supertype in allSupertypes) ...[
-            if (!supertype.isDartCoreObject)
-              ...supertype.element.getters.map((e) => e.variable),
-            if (!supertype.isDartCoreObject)
-              ...supertype.element.setters.map((e) => e.variable),
-          ],
-        ]
+      ...accessors.map((e) => e.variable2!),
+      for (final supertype in allSupertypes) ...[
+        if (!supertype.isDartCoreObject)
+          ...supertype.accessors.map((e) => e.variable2!),
+      ],
+    ]
         .where(
           (e) =>
               e.isPublic &&
               !e.isStatic &&
               !e.jsonIgnore &&
-              accessorNames.add(e.name!),
+              accessorNames.add(e.name),
         )
         .toList();
   }
 
   ConstructorElement get jsonConstructor {
     return constructors.firstWhere(
-      (e) => e.name == 'new',
+      (e) => e.name.isEmpty,
       orElse: () => err('No default constructor found', this),
     );
   }
@@ -57,8 +54,8 @@ extension ClassElementX on ClassElement {
   bool hasFromConstructor(String name, String param) {
     bool check(InterfaceType t, String name, String param) {
       for (final c in t.constructors) {
-        if (c.name == name && c.formalParameters.length == 1) {
-          final posParam = c.formalParameters.firstWhere((e) => e.isPositional);
+        if (c.name == name && c.parameters.length == 1) {
+          final posParam = c.parameters.firstWhere((e) => e.isPositional);
           if (posParam.type.toString() == param) {
             return true;
           }
@@ -71,7 +68,7 @@ extension ClassElementX on ClassElement {
     if (isPrivate && displayName.startsWith(r'_$_')) {
       // find super Type with == cleanName
       final superType = allSupertypes.firstWhere((e) {
-        final display = e.getDisplayString();
+        final display = e.getDisplayString(withNullability: false);
         return display == cleanName;
       });
       // check for constructor
@@ -81,8 +78,8 @@ extension ClassElementX on ClassElement {
     }
   }
 
-  FormalParameterElement? constructorParam(String name) {
-    for (final param in jsonConstructor.formalParameters) {
+  ParameterElement? constructorParam(String name) {
+    for (final param in jsonConstructor.parameters) {
       if (param.name == name) {
         return param;
       }
@@ -131,19 +128,19 @@ extension PropertyInducingElementX on PropertyInducingElement {
       return annName;
     }
 
-    final separator = _jsonKebabChecker.hasAnnotationOf(enclosingElement!)
+    final separator = _jsonKebabChecker.hasAnnotationOf(enclosingElement3!)
         ? '-'
-        : _jsonSnakeChecker.hasAnnotationOf(enclosingElement!)
-        ? '_'
-        : null;
+        : _jsonSnakeChecker.hasAnnotationOf(enclosingElement3!)
+            ? '_'
+            : null;
     if (separator != null) {
-      return name!.splitMapJoin(
+      return name.splitMapJoin(
         RegExp('([A-Z])'),
         onMatch: (m) => '$separator${m.group(1)!.toLowerCase()}',
         onNonMatch: (s) => s,
       );
     } else {
-      return name!;
+      return name;
     }
   }
 
@@ -176,25 +173,25 @@ extension PropertyInducingElementX on PropertyInducingElement {
 
 extension ExecutableElementX on ExecutableElement {
   String get qualifiedName {
-    if (this is TopLevelFunctionElement) {
-      return name!;
+    if (this is FunctionElement) {
+      return name;
     }
 
     if (this is MethodElement) {
-      final method = this as MethodElement;
-      return '${method.enclosingElement!.name}.${method.name}';
+      return '${enclosingElement3.name}.$name';
     }
 
     if (this is ConstructorElement) {
-      final constructor = this as ConstructorElement;
       // Ignore the default constructor.
-      if (constructor.name == 'new') {
-        return '${constructor.enclosingElement.name}';
+      if (name.isEmpty) {
+        return '${enclosingElement3.name}';
       }
-      return '${constructor.enclosingElement.name}.${constructor.name}';
+      return '${enclosingElement3.name}.$name';
     }
 
-    throw UnsupportedError('Not sure how to support typeof $runtimeType');
+    throw UnsupportedError(
+      'Not sure how to support typeof $runtimeType',
+    );
   }
 }
 

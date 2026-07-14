@@ -7,11 +7,14 @@ import 'package:test/test.dart';
 part 'freezed_test.g.dart';
 part 'freezed_test.freezed.dart';
 
-@json
 @freezed
-abstract class TestObject with _$TestObject {
-  const factory TestObject({required String name, required int age}) =
-      _TestObject;
+class TestObject with _$TestObject {
+  // ignore: invalid_annotation_target
+  @json
+  const factory TestObject({
+    required String name,
+    required int age,
+  }) = _TestObject;
 }
 
 @jsonKebabCase

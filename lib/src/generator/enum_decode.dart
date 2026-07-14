@@ -18,9 +18,9 @@ String _generateEnumMap(EnumElement cls, String propertyName) {
 
   if (propertyName == 'name') {
     for (final element in enumElements) {
-      valueMap[element.jsonName] = element.name!;
+      valueMap[element.jsonName] = element.name;
       for (final alias in element.jsonAliases) {
-        valueMap[alias] = element.name!;
+        valueMap[alias] = element.name;
       }
     }
   } else {
@@ -29,8 +29,7 @@ String _generateEnumMap(EnumElement cls, String propertyName) {
       if (field == null) {
         err('Enum field $propertyName not found.', element);
       }
-      final value =
-          field.toBoolValue() ??
+      final value = field.toBoolValue() ??
           field.toIntValue() ??
           field.toDoubleValue() ??
           field.toStringValue();
@@ -41,19 +40,17 @@ String _generateEnumMap(EnumElement cls, String propertyName) {
       if (valueMap.values.contains(value)) {
         err('Enum property has duplicate values.', element);
       }
-      valueMap[value] = element.name!;
+      valueMap[value] = element.name;
     }
   }
 
   final enumName = cls.displayName;
-  return valueMap.entries
-      .map((e) {
-        final key = e.key;
-        if (key is String) {
-          return "'$key': $enumName.${e.value}";
-        } else {
-          return '$key: $enumName.${e.value}';
-        }
-      })
-      .join(',');
+  return valueMap.entries.map((e) {
+    final key = e.key;
+    if (key is String) {
+      return "'$key': $enumName.${e.value}";
+    } else {
+      return '$key: $enumName.${e.value}';
+    }
+  }).join(',');
 }
