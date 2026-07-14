@@ -28,13 +28,7 @@ class Place {
 }
 
 @json
-enum PlaceType {
-  admin,
-  country,
-  city,
-  poi,
-  neighborhood;
-}
+enum PlaceType { admin, country, city, poi, neighborhood }
 
 @JsonSerializable()
 @json

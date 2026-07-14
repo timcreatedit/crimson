@@ -26,13 +26,11 @@ FCModel? toJson(String? val) {
 }
 
 @freezed
-class FCFreezed with _$FCFreezed {
+abstract class FCFreezed with _$FCFreezed {
   // ignore: invalid_annotation_target
   @json
-  const factory FCFreezed({
-    required String name,
-    required int age,
-  }) = _FCFreezed;
+  const factory FCFreezed({required String name, required int age}) =
+      _FCFreezed;
 
   factory FCFreezed.fromCrimson(Crimson c) {
     final map = c.read() as Map<String, dynamic>;
@@ -42,10 +40,7 @@ class FCFreezed with _$FCFreezed {
 
 extension on _$FCFreezed {
   void toCrimson(CrimsonWriter w) {
-    final map = <String, dynamic>{
-      'name': name,
-      'age': age,
-    };
+    final map = <String, dynamic>{'name': name, 'age': age};
     w.write(map);
   }
 }
@@ -63,10 +58,7 @@ class FCModel {
   }
 
   void toCrimson(CrimsonWriter w) {
-    final map = <String, dynamic>{
-      'name': name,
-      'age': age,
-    };
+    final map = <String, dynamic>{'name': name, 'age': age};
     w.write(map);
   }
 }

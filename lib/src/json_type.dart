@@ -16,5 +16,5 @@ enum JsonType {
   bool,
 
   /// Null.
-  nil
+  nil,
 }

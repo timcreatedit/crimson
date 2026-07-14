@@ -22,16 +22,16 @@ void main() {
           'a': {
             'list': [
               {
-                'deep': {'list': [], 'map': {}}
-              }
+                'deep': {'list': [], 'map': {}},
+              },
             ],
-            'map': {}
+            'map': {},
           },
-          'b': {'list': [], 'map': {}}
+          'b': {'list': [], 'map': {}},
         },
         {
           'b': {'list': [], 'map': {}},
-          'c': {'list': [], 'map': {}}
+          'c': {'list': [], 'map': {}},
         },
       ],
       'map': {
@@ -40,15 +40,15 @@ void main() {
             'list': [],
             'map': {
               'deep2': [
-                {'list': [], 'map': {}}
-              ]
-            }
+                {'list': [], 'map': {}},
+              ],
+            },
           },
-          {'list': [], 'map': {}}
+          {'list': [], 'map': {}},
         ],
         'b': [
           {'list': [], 'map': {}},
-          {'list': [], 'map': {}}
+          {'list': [], 'map': {}},
         ],
       },
     };

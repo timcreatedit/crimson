@@ -18,11 +18,7 @@ class JsonIgnoreTest {
 
 void main() {
   test('@jsonIgnore', () {
-    final json = {
-      'val1': 'test1',
-      'val2': 'test2',
-      'val3': 'test3',
-    };
+    final json = {'val1': 'test1', 'val2': 'test2', 'val3': 'test3'};
     final crimson = Crimson(utf8.encode(jsonEncode(json)));
     final test = crimson.readJsonIgnoreTest();
     expect(test.val1, null);

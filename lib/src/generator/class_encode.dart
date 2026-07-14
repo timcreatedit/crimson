@@ -22,8 +22,9 @@ String _writeAccessor(ClassElement cls) {
       continue; // we don't support serializing nested objects
     }
 
-    final raw = !accessor.jsonName.codeUnits
-        .any((e) => e == tokenDoubleQuote || e == tokenBackslash || e > 127);
+    final raw = !accessor.jsonName.codeUnits.any(
+      (e) => e == tokenDoubleQuote || e == tokenBackslash || e > 127,
+    );
     if (raw) {
       code += "writeObjectKeyRaw('${accessor.jsonName}');";
     } else {
@@ -47,7 +48,8 @@ String _writeAccessor(ClassElement cls) {
 String _write(String name, DartType type) {
   var code = '';
   if (type.isNullable) {
-    code += '''
+    code +=
+        '''
       if ($name == null) {
         writeNull();
       } else {''';
@@ -55,14 +57,16 @@ String _write(String name, DartType type) {
   if (type.hasFromCrimsonConstructor) {
     code += '$name.toCrimson(this);';
   } else if (type.isDartCoreList || type.isDartCoreSet) {
-    code += '''
+    code +=
+        '''
       writeArrayStart();
       for (final value in $name) {
         ${_write('value', type.listParam)}
       }
       writeArrayEnd();''';
   } else if (type.isDartCoreMap) {
-    code += '''
+    code +=
+        '''
       writeObjectStart();
       for (final key in $name.keys) {
         writeObjectKey(key);
