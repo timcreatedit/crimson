@@ -1,4 +1,4 @@
-// ignore_for_file: use_string_buffers
+// ignore_for_file: deprecated_member_use, use_string_buffers
 
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -13,7 +13,7 @@ String generateClassDecode(ClassElement element) {
 
     loop:
     while(true) {
-      switch(iterObjectHash()) {
+      switch(iterObjectSafeHash()) {
         case -1:
           break loop;
         ${_generateReadAccessors(element)}
@@ -46,7 +46,8 @@ String _generateReadAccessors(ClassElement cls) {
     final names = [accessor.jsonName, ...accessor.jsonAliases];
     for (final name in names) {
       final pointer = _pointer(name);
-      code += 'case ${Crimson.hash(pointer[0].toString())}: // ${pointer[0]}\n';
+      code +=
+          'case ${Crimson.safeHash(pointer[0].toString())}: // ${pointer[0]}\n';
 
       final fromJson = accessor.fromJson;
       final type = fromJson?.parameters.first.type ?? accessor.type;
@@ -84,8 +85,10 @@ String _generateReadSegment(dynamic segment, String read) {
   var code = '''
     final nextType = whatIsNext();
     if (nextType == JsonType.object) {
-      for (var hash = iterObjectHash(); hash != -1; hash = iterObjectHash()) {
-        if (hash == ${Crimson.hash(segment.toString())}) /* $segment */ {
+      for (var hash = iterObjectSafeHash();
+          hash != -1;
+          hash = iterObjectSafeHash()) {
+        if (hash == ${Crimson.safeHash(segment.toString())}) /* $segment */ {
           $read
           skipPartialObject();
           break;
@@ -145,7 +148,6 @@ String _read(DartType type, bool nullable) {
   final orNull = nullable ? 'OrNull' : '';
   final skipNull = nullable ? 'skipNull() ? null : ' : '';
   if (type.hasFromCrimsonConstructor) {
-    // ignore: deprecated_member_use
     return '$skipNull ${type.name}.fromCrimson(this)';
   } else if (type.isDartCoreList || type.isDartCoreSet) {
     return '''

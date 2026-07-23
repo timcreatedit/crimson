@@ -1,9 +1,10 @@
-// ignore_for_file: avoid_js_rounded_ints
-
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:crimson/src/consts.dart';
+import 'package:crimson/src/hash_native.dart'
+    if (dart.library.js_interop) 'package:crimson/src/hash_web.dart'
+    as platform_hash;
 import 'package:crimson/src/json_type.dart';
 
 /// Crimson is a JSON parser that is optimized for speed.
@@ -79,7 +80,6 @@ class Crimson {
         skipPartialObject();
       default:
         _skipNumber();
-        break;
     }
   }
 
@@ -469,8 +469,8 @@ class Crimson {
 
   /// Reads a string value as hash.
   ///
-  /// The hash function is based on the FNV-1a algorithm. [hash] yields the same
-  /// value as [readStringHash] for the same string.
+  /// The hash function is based on the FNV-1a algorithm on native platforms.
+  /// [hash] yields the same value as [readStringHash] for the same string.
   @pragma('vm:prefer-inline')
   int readStringHash() {
     _skipWhitespace();
@@ -483,7 +483,7 @@ class Crimson {
     }
 
     var i = _offset + 1;
-    var hash = 0xcbf29ce484222325;
+    var hash = platform_hash.initialHash;
     while (true) {
       var c = buffer[i++];
       if (c == tokenDoubleQuote) {
@@ -492,8 +492,26 @@ class Crimson {
       } else if (c == tokenBackslash) {
         c = _readEscapeSequence(buffer[i++]);
       }
-      hash ^= c;
-      hash *= 0x100000001b3;
+      hash = platform_hash.nextHash(hash, c);
+    }
+  }
+
+  int _readStringSafeHash() {
+    if (buffer[_offset] != tokenDoubleQuote) {
+      _error(_offset, expected: '"');
+    }
+
+    var i = _offset + 1;
+    var hash = 0;
+    while (true) {
+      var c = buffer[i++];
+      if (c == tokenDoubleQuote) {
+        _offset = i;
+        return hash;
+      } else if (c == tokenBackslash) {
+        c = _readEscapeSequence(buffer[i++]);
+      }
+      hash = _nextSafeHash(hash, c);
     }
   }
 
@@ -573,6 +591,13 @@ class Crimson {
   @pragma('vm:prefer-inline')
   int iterObjectHash() => _iterObject(_readStringHash, -1);
 
+  /// Allows iterating a map value using a cross-platform-safe field hash.
+  ///
+  /// Returns a hash of the next field name, or `-1` if there are no more
+  /// fields.
+  @pragma('vm:prefer-inline')
+  int iterObjectSafeHash() => _iterObject(_readStringSafeHash, -1);
+
   /// Convenience method to read a list.
   List<dynamic> readArray() {
     final list = <dynamic>[];
@@ -622,11 +647,26 @@ class Crimson {
   /// This method should only be used at compile-time since it is not very fast.
   static int hash(String string) {
     final bytes = utf8.encode(string);
-    var hash = 0xcbf29ce484222325;
+    var hash = platform_hash.initialHash;
     for (var i = 0; i < bytes.length; i++) {
-      hash ^= bytes[i];
-      hash *= 0x100000001b3;
+      hash = platform_hash.nextHash(hash, bytes[i]);
     }
     return hash;
   }
+
+  /// Hashes [string] to a value represented exactly on every Dart platform.
+  static int safeHash(String string) {
+    final bytes = utf8.encode(string);
+    var hash = 0;
+    for (var i = 0; i < bytes.length; i++) {
+      hash = _nextSafeHash(hash, bytes[i]);
+    }
+    return hash;
+  }
+
+  // Keep intermediate values below JavaScript's maximum safe integer. The
+  // modulus is the largest prime below 2^48, so multiplying by 31 remains exact
+  // on every Dart platform.
+  static int _nextSafeHash(int hash, int byte) =>
+      (hash * 31 + byte) % 281474976710597;
 }
