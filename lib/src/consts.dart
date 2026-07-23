@@ -1,5 +1,7 @@
 // ignore_for_file: public_member_api_docs
 
+export 'max_int_native.dart' if (dart.library.js_interop) 'max_int_web.dart';
+
 const tokenSpace = 0x20;
 const tokenLineFeed = 0x0A;
 const tokenCarriageReturn = 0x0D;
@@ -76,8 +78,6 @@ const twoByteLimit = 0x7ff; // 11 bits
 const surrogateTagMask = 0xFC00;
 const surrogateValueMask = 0x3FF;
 const leadSurrogateMin = 0xD800;
-
-const maxInt = 9223372036854775807;
 
 const canDirectWrite = [
   false, false, false, false, false, false, false, false, //
