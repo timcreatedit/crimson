@@ -8,7 +8,7 @@ part 'freezed_test.g.dart';
 part 'freezed_test.freezed.dart';
 
 @freezed
-class TestObject with _$TestObject {
+abstract class TestObject with _$TestObject {
   // ignore: invalid_annotation_target
   @json
   const factory TestObject({

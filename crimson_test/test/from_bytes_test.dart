@@ -6,7 +6,7 @@ part 'from_bytes_test.g.dart';
 part 'from_bytes_test.freezed.dart';
 
 @freezed
-class FBFreezed with _$FBFreezed {
+abstract class FBFreezed with _$FBFreezed {
   // ignore: invalid_annotation_target
   @json
   const factory FBFreezed({

@@ -49,7 +49,7 @@ String _generateReadAccessors(ClassElement cls) {
       code += 'case ${Crimson.hash(pointer[0].toString())}: // ${pointer[0]}\n';
 
       final fromJson = accessor.fromJson;
-      final type = fromJson?.parameters.first.type ?? accessor.type;
+      final type = fromJson?.formalParameters.first.type ?? accessor.type;
       final hasDefault = cls.defaultValue(accessor.name) != null;
       var value =
           _read(type, type.isNullable || (hasDefault && fromJson == null));

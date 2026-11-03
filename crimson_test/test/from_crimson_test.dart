@@ -26,7 +26,7 @@ FCModel? toJson(String? val) {
 }
 
 @freezed
-class FCFreezed with _$FCFreezed {
+abstract class FCFreezed with _$FCFreezed {
   // ignore: invalid_annotation_target
   @json
   const factory FCFreezed({
